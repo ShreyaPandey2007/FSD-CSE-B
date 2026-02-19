@@ -22,8 +22,6 @@ const server = http.createServer((req, res) => {
         res.setHeader("Content-Type","application/json");
         res.write(JSON.stringify(sysinfo));
         res.end();
-        
-
     }
     if(url==='/senddata'&& method=="POST"){
         

@@ -1,48 +1,45 @@
 import http from 'http';
-import { arch } from 'os';
-import os,{freemem,platform} from 'os';
+const userdata=[{
+    id:"1",
+    name:"John Doe",
+    email:"abc@gmail.com"
+},{id:"2",name:"Jane Smith",email:"jane@gmail.com"},
+{id:"3",name:"Bob Johnson",email:"bob@gmail.com"}];
 const server = http.createServer((req, res) => {
-    const url=req.url;
-     let body="";
-     let data=[];
-    if(url==='/'&& req.method=="GET"){
+    const url=req.url;  
+    const method=req.method;
+    if(url==='/'&& method=="GET"){
         res.end('Home Page');
     }
-    else if(url==='/about' && req.method=="GET"){
-        res.end('About Page');
+    if(url==='/users'&& method=="GET"){
+        res.end(JSON.stringify(userdata));
     }
-    else if(url==='/contact' && req.method=="GET"){
-        res.end('Contact Page');
-    }
-    else if(url==='/senddata' && req.method=="POST"){
-       
-        req.on('data',(chunk)=>{
-            body+=chunk;
-        });
-        req.on('end',()=>{
-            console.log('Received data:',body);
-            data.push(body);
-            res.end(body+'Data received successfully');
-           
-        });
-    }
-    else if(url==="/system" && req.method=="GET"){
-        const systemInfo={
-            platform:os.platform(),
-            arch:os.arch(),
-            cpu:os.cpuUsage().length,
-            totalRam:(os.totalmem()/1024**3).toFixed(2)+"GB",
-            freemem:(os.freemem()/1024**3).toFixed(2)+"GB"
-        }
-        res.setHeader("Content-Type","application/json"),
-        res.end(JSON.stringify(sysdata))
 
+    if(url.startsWith('/users/') && method=="GET"){
+       const id=url.split('/')[2];
+       const data=userdata.find(user=>user.id==id);
+       if(data){
+           res.end(JSON.stringify(data));
+       } else {
+           res.statusCode=404;
+          return res.end('User Not Found');
+       }
+    }
+    if(url.startsWith('/users/') && method=="DELETE"){
+       const id=url.split('/')[2];
+       const data=userdata.findIndex(user=>user.id==id);
+       if(data>-1){
+           userdata.splice(data,1);
+         res.end('User Deleted Successfully');
+       } else {
+           res.statusCode=404;
+          return res.end('User Not Found');
+       }
     }
     else{
         res.statusCode=404;
-        res.end('Page Not Found');
-    }
-
+        res.end('Not Found');
+    }  
 });
 server.listen(3000,()=>{
     console.log('Server is running on port 3000');
