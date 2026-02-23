@@ -35,10 +35,7 @@ const server = http.createServer((req, res) => {
             res.end(userdata.toString());
         })
     }
-    if(url==="/viewdata" && method=="GET"){
-        res.setHeader("Content-Type","application/json");
-        res.end(JSON.stringify(userdata));
-    }
+    
 })
 server.listen(3000,()=>{
     console.log('Server is running on port 3000');
